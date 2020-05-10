@@ -26,9 +26,6 @@ COLORREF BackgroundColour = BLACK;
 COLORREF SnakeColour = RED;
 COLORREF FoodColour = BLUE;
 
-void ColRectangle(int bottom, int top, int left, int right, COLORREF col);
-void CenterRectangle(int CenterX, int CenterY, int line, COLORREF col);
-
 class coordinate {
 private:
 public:
@@ -81,12 +78,16 @@ public:
 	void Background();
 	void KeyboardControl();
 	void HandleLogic();
+	void EatSelf(queue<coordinate> &q, coordinate n);
 };
 
 coordinate head(10, 31);
 coordinate tail(10, 10);
 coordinate food(320, 240);
-Snake snake(width * 5, width, RED, 0);
+Snake snake(width * 30, width, RED, 0);
+
+void ColRectangle(int bottom, int top, int left, int right, COLORREF col);
+void CenterRectangle(int CenterX, int CenterY, int line, COLORREF col);
 
 bool IsKeyDown(int key) {
 	return (GetAsyncKeyState(key) & 0x8000 ? 1 : 0);
@@ -129,10 +130,14 @@ void  Snake::HandleLogic() {
 		isEaten = true;
 		head.set(dir);
 		pos.push(head);
+		initialLength++;
+		//ColRectangle(); //food.x + width/2  food.y + width/2
 	}
 	else {
 		isEaten = false;
 	}
+	queue<coordinate> tmp = pos;
+	EatSelf(tmp, head);
 }
 
 void Snake::KeyboardControl() {
@@ -141,16 +146,34 @@ void Snake::KeyboardControl() {
 		return;
 	}
 	if (IsKeyDown(KEY_W)) {
-		dir = -90;
+		if(dir != 90)
+			dir = -90;
 	}
 	if (IsKeyDown(KEY_S)) {
-		dir = 90;
+		if (dir != -90)
+			dir = 90;
 	}
 	if (IsKeyDown(KEY_D)) {
-		dir = 0;
+		if (dir != 180)
+			dir = 0;
 	}
 	if (IsKeyDown(KEY_A)) {
-		dir = 180;
+		if (dir != 0)
+			dir = 180;
+	}
+}
+
+void Snake::EatSelf(queue<coordinate> &q, coordinate n) {
+	int size = q.size();
+	for (int i = 0; i < size - 2; ++i) {
+		coordinate a = q.front();
+		if (a == n) {
+			for (int j = 0; j < i; ++j) {
+				CenterRectangle(pos.front().x, pos.front().y, width, BackgroundColour);
+				pos.pop();
+			}
+		}
+		q.pop();
 	}
 }
 
