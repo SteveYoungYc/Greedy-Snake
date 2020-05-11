@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <Windows.h>
-#include <graphics.h>      // 引用图形库头文件
+#include <graphics.h>
 #include <conio.h>
 #include <cstdlib>
 #include <iostream>
